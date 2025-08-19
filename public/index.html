@@ -157,12 +157,11 @@
     </div>
 
     <script>
-        // All JavaScript functions are defined here - NO onclick attributes needed
-        
+        // Show status message function
         function showStatus(message, type = 'loading') {
             const statusEl = document.getElementById('statusMessage');
             statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
+            statusEl.className = 'status ' + type;
             statusEl.style.display = 'block';
             
             if (type === 'success') {
@@ -172,21 +171,13 @@
             }
         }
         
+        // Hide player function
         function hidePlayer() {
             document.getElementById('playerContainer').style.display = 'none';
             document.getElementById('videoPlayer').src = '';
         }
         
-        async function pasteFromClipboard() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('teraboxUrl').value = text;
-                showStatus('✅ URL pasted from clipboard!', 'success');
-            } catch (error) {
-                showStatus('❌ Could not access clipboard', 'error');
-            }
-        }
-        
+        // Main video processing function - UPDATED
         async function processVideo() {
             const url = document.getElementById('teraboxUrl').value.trim();
             const playBtn = document.getElementById('playBtn');
@@ -216,8 +207,18 @@
                     body: JSON.stringify({ url: url })
                 });
                 
-                const extractData = await extractResponse.json();
-                console.log('Extract Response:', extractData);
+                // Debug: Get raw response text first
+                const responseText = await extractResponse.text();
+                console.log('Raw Response:', responseText);
+                console.log('Response Status:', extractResponse.status);
+                
+                // Try to parse as JSON
+                let extractData;
+                try {
+                    extractData = JSON.parse(responseText);
+                } catch (jsonError) {
+                    throw new Error('Server returned invalid response: ' + responseText.substring(0, 100) + '...');
+                }
                 
                 if (!extractData.success) {
                     throw new Error(extractData.error || 'Video extraction failed');
@@ -229,9 +230,10 @@
                 }
                 
                 showStatus('✅ Video extracted successfully!', 'success');
+                console.log('Video URL:', videoUrl);
                 
                 // Setup video player
-                const streamUrl = `/api/stream?url=${encodeURIComponent(videoUrl)}`;
+                const streamUrl = '/api/stream?url=' + encodeURIComponent(videoUrl);
                 const videoPlayer = document.getElementById('videoPlayer');
                 
                 videoPlayer.src = streamUrl;
@@ -251,16 +253,27 @@
                 
             } catch (error) {
                 console.error('Processing Error:', error);
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus('❌ Error: ' + error.message, 'error');
             } finally {
                 playBtn.disabled = false;
                 playBtn.innerHTML = '🚀 Extract & Play Video';
             }
         }
         
-        // Event listeners using proper JavaScript (NOT onclick attributes)
+        // Paste from clipboard function
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('teraboxUrl').value = text;
+                showStatus('✅ URL pasted from clipboard!', 'success');
+            } catch (error) {
+                showStatus('❌ Could not access clipboard', 'error');
+            }
+        }
+        
+        // Event listeners setup when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Attach event listeners after DOM is ready
+            // Attach event listeners to buttons
             document.getElementById('pasteBtn').addEventListener('click', pasteFromClipboard);
             document.getElementById('playBtn').addEventListener('click', processVideo);
             
