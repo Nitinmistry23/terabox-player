@@ -1,16 +1,25 @@
 {
-  "name": "terabox-player",
+  "name": "terabox-player-working",
   "version": "1.0.0",
-  "description": "TeraBox video player with XDisk API",
+  "description": "100% Working TeraBox Player with XDisk API Integration",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "vercel dev"
   },
   "dependencies": {
-    "axios": "^1.6.0"
+    "axios": "^1.6.2"
   },
   "engines": {
     "node": "18.x"
-  }
+  },
+  "keywords": [
+    "terabox",
+    "video-player",
+    "xdisk-api",
+    "vercel",
+    "nodejs"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
 }
