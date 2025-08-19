@@ -9,5 +9,13 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
-  ]
+  ],
+  "functions": {
+    "api/extract.js": {
+      "maxDuration": 45
+    },
+    "api/stream.js": {
+      "maxDuration": 120
+    }
+  }
 }
